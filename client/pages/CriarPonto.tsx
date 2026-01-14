@@ -162,7 +162,7 @@ export default function CriarPonto() {
 
   useEffect(() => {
     if (mapRef.current && !leafletRef.current) {
-      const centerCoords = [-28.65998361878308, -56.006636446551234]; //Centro de São Borja.
+      const centerCoords: [number, number] = [-28.65998361878308, -56.006636446551234]; //Centro de São Borja.
       const initialZoom = 14;
       const maxMapZoom = 18;
 
@@ -240,58 +240,90 @@ export default function CriarPonto() {
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Novo Ponto de Coleta</CardTitle>
-          <CardDescription>Insira o endereço, clique em "Localizar no Mapa". Depois, clique no mapa para definir a localização exata.</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-6 md:grid-cols-2">
-          <form onSubmit={onSubmit} className="grid gap-3">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Nome do Ponto</Label>
-              <Input id="name" name="name" value={nameInput} onChange={(e) => setNameInput(e.target.value)} required />
+    <div className="flex justify-center items-center min-h-[calc(100vh-200px)] p-4">
+      <div className="w-full max-w-6xl glass p-8 rounded-3xl relative overflow-hidden">
+        {/* Background Decorative */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10 -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl -z-10 translate-y-1/2 -translate-x-1/2" />
+
+        <div className="flex flex-col lg:flex-row gap-8 h-full">
+          {/* Left Column: Form */}
+          <div className="lg:w-1/3 space-y-6 flex flex-col">
+            <div className="space-y-2">
+              <h1 className="text-3xl font-black font-heading tracking-tight">Novo Ponto</h1>
+              <p className="text-muted-foreground font-body">
+                Cadastre um novo local de coleta para ajudar a comunidade.
+              </p>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="description">Descrição</Label>
-              <Textarea id="description" name="description" value={descriptionInput} onChange={(e) => setDescriptionInput(e.target.value)} />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="address">Endereço (Rua, Bairro)</Label>
-              <Input
-                id="address"
-                name="address"
-                value={addressInput}
-                onChange={(e) => setAddressInput(e.target.value)}
-                required
-                placeholder="Ex: Rua das Flores, Centro"
-              />
-            </div>
-            <Button
-              type="button"
-              onClick={() => setAddressToGeocode(addressInput)} // Dispara a geolocalização
-              disabled={loading || !addressInput}
-              className="mt-2"
-            >
-              {loading ? 'Localizando...' : 'Localizar Endereço'}
-            </Button>
-            <div className="grid gap-2">
-              <Label htmlFor="types">Tipos aceitos (ex.: baterias, celulares, cabos)</Label>
-              <Input id="types" name="types" value={typesInput} onChange={(e) => setTypesInput(e.target.value)} />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="hours">Horário de funcionamento</Label>
-              <Input id="hours" name="hours" value={hoursInput} onChange={(e) => setHoursInput(e.target.value)} />
-            </div>
-            <Button type="submit" disabled={loading || !latlng}>
-              {loading ? 'Salvando...' : (!latlng ? 'Clique no mapa para salvar' : 'Salvar Ponto')}
-            </Button>
-          </form>
-          <div className="min-h-[50vh] w-full">
-            <div ref={mapRef} className="h-full w-full rounded-md border" />
+
+            <form onSubmit={onSubmit} className="space-y-4 flex-1 flex flex-col justify-center">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="font-heading font-bold text-primary">Nome do Local</Label>
+                <Input id="name" name="name" value={nameInput} onChange={(e) => setNameInput(e.target.value)} required className="glass-input" />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="address" className="font-heading font-bold text-primary">Endereço</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="address"
+                    name="address"
+                    value={addressInput}
+                    onChange={(e) => setAddressInput(e.target.value)}
+                    required
+                    placeholder="Rua, Bairro..."
+                    className="glass-input"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => setAddressToGeocode(addressInput)}
+                    disabled={loading || !addressInput}
+                    size="icon"
+                    className="shrink-0"
+                  >
+                    <MapPin className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">Clique no ícone para localizar no mapa.</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="types" className="font-bold">Tipos Aceitos</Label>
+                  <Input id="types" value={typesInput} onChange={(e) => setTypesInput(e.target.value)} placeholder="Ex: Vidro, Papel" className="glass-input" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="hours" className="font-bold">Horário</Label>
+                  <Input id="hours" value={hoursInput} onChange={(e) => setHoursInput(e.target.value)} placeholder="08h - 18h" className="glass-input" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description" className="font-bold">Descrição (Opcional)</Label>
+                <Textarea id="description" value={descriptionInput} onChange={(e) => setDescriptionInput(e.target.value)} className="glass-input resize-none h-24" />
+              </div>
+
+              <Button type="submit" disabled={loading || !latlng} size="lg" className="w-full font-heading font-bold shadow-lg hover:shadow-primary/25 mt-4">
+                {loading ? 'Salvando...' : (!latlng ? 'Selecione no Mapa' : 'Confirmar Cadastro')}
+              </Button>
+            </form>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Right Column: Map */}
+          <div className="lg:w-2/3 h-[500px] lg:h-auto rounded-3xl overflow-hidden glass shadow-2xl relative border-4 border-white/10 group">
+            <div ref={mapRef} className="h-full w-full z-0 opacity-90 group-hover:opacity-100 transition-opacity" />
+
+            {!latlng && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm pointer-events-none z-10 transition-opacity duration-500" style={{ opacity: addressToGeocode ? 0 : 1 }}>
+                <div className="text-center text-white p-6 glass rounded-xl">
+                  <MapPin className="h-12 w-12 mx-auto mb-2 animate-bounce" />
+                  <p className="font-heading font-bold text-lg">Localize o endereço ou clique no mapa</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

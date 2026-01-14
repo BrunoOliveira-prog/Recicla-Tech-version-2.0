@@ -107,113 +107,133 @@ export default function PontosDeColeta() {
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Pontos de Coleta</CardTitle>
-          <CardDescription>
+    <div className="space-y-8 max-w-7xl mx-auto p-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div className="space-y-1">
+          <h1 className="text-4xl font-black font-heading tracking-tight text-foreground">Pontos de Coleta</h1>
+          <p className="text-muted-foreground font-body text-lg">
             {isCollector
-              ? 'Gerencie os pontos de coleta que você cadastrou.'
-              : 'Veja os pontos de coleta disponíveis para reciclagem.'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-3">
-          {points.length === 0 && <p className="text-muted-foreground">Nenhum ponto de coleta encontrado.</p>}
-          {points.map((p, index) => (
-            <div key={p.id} className={`flex flex-wrap items-center justify-between gap-3 rounded-md border p-3 ${!p.is_active ? 'opacity-50 grayscale' : ''}`}>
-              <div className="space-y-1">
-                <p className="font-medium">{p.name} {p.is_active ? '' : '(Inativo)'}</p>
-                <p className="text-sm text-muted-foreground">{p.address || 'Endereço não especificado'}</p>
-                <p className="text-sm text-muted-foreground">Tipos: {p.types || 'Não especificado'}</p>
-                <p className="text-sm text-muted-foreground">Horário: {p.hours || 'Não especificado'}</p>
-                {p.description && <p className="text-sm text-muted-foreground">Descrição: {p.description}</p>}
+              ? 'Gerencie seus pontos de impacto sustentável.'
+              : 'Encontre o local mais próximo para descartar seu lixo eletrônico.'}
+          </p>
+        </div>
+
+        {isCollector && (
+          <Button asChild size="lg" className="shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+            <Link to="/pontos/novo">
+              <PlusCircle className="h-5 w-5 mr-2" /> Cadastrar Novo Ponto
+            </Link>
+          </Button>
+        )}
+      </div>
+
+      {points.length === 0 && (
+        <div className="text-center py-20 opacity-50">
+          <MapPin className="h-20 w-20 mx-auto mb-4 text-muted-foreground/30" />
+          <p className="text-xl font-heading text-muted-foreground">Nenhum ponto de coleta encontrado.</p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {points.map((p, index) => (
+          <div
+            key={p.id}
+            className={`glass-card p-6 rounded-3xl relative overflow-hidden group transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl border-white/10 ${!p.is_active ? 'opacity-75 grayscale-[0.5]' : ''}`}
+            style={{ animationDelay: `${index * 50}ms` }}
+          >
+            {/* Status Indicator */}
+            <div className={`absolute top-4 right-4 w-3 h-3 rounded-full ${p.is_active ? 'bg-emerald-500 shadow-[0_0_10px_#10b981]' : 'bg-red-500 shadow-[0_0_10px_#ef4444]'}`} />
+
+            <div className="space-y-4 relative z-10">
+              <div>
+                <h3 className="text-2xl font-bold font-heading text-primary line-clamp-1 group-hover:text-accent transition-colors">{p.name}</h3>
+                <div className="flex items-center text-sm text-muted-foreground mt-1">
+                  <MapPin className="h-3 w-3 mr-1" />
+                  <span className="line-clamp-1">{p.address || 'Endereço não especificado'}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => navigate(`/mapa?lat=${p.lat}&lng=${p.lng}`)}>
-                  <MapPin className="h-4 w-4 mr-2" /> Ver no Mapa
+
+              <div className="space-y-2 pt-2 border-t border-white/5">
+                <p className="text-sm">
+                  <span className="font-bold text-foreground/80 font-heading text-xs uppercase tracking-wider">Tipos:</span>
+                  <span className="text-muted-foreground ml-2">{p.types || 'Diversos'}</span>
+                </p>
+                <p className="text-sm">
+                  <span className="font-bold text-foreground/80 font-heading text-xs uppercase tracking-wider">Horário:</span>
+                  <span className="text-muted-foreground ml-2">{p.hours || 'Comercial'}</span>
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2 pt-4">
+                <Button variant="outline" size="sm" onClick={() => navigate(`/mapa?lat=${p.lat}&lng=${p.lng}`)} className="flex-1 bg-white/5 hover:bg-white/10 border-white/10">
+                  <MapPin className="h-4 w-4 mr-2 text-primary" /> Mapa
                 </Button>
+
                 {isCollector && p.owner_id === user?.id && (
                   <>
-                    {/* Modal de Edição */}
                     <Dialog open={editingPoint?.id === p.id} onOpenChange={(isOpen) => !isOpen && setEditingPoint(null)}>
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" onClick={() => setEditingPoint(p)} disabled={loading}>
-                          <Pencil className="h-4 w-4 mr-2" /> Editar
+                        <Button variant="ghost" size="icon" onClick={() => setEditingPoint(p)} disabled={loading} className="h-9 w-9 text-muted-foreground hover:text-foreground">
+                          <Pencil className="h-4 w-4" />
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
+                      <DialogContent className="sm:max-w-[425px] glass border-white/10">
                         <DialogHeader>
-                          <DialogTitle>Editar Ponto de Coleta</DialogTitle>
-                          <DialogDescription>Faça as alterações desejadas e clique em Salvar.</DialogDescription>
+                          <DialogTitle className="font-heading">Editar Ponto</DialogTitle>
+                          <DialogDescription>Atualize as informações do seu ponto de coleta.</DialogDescription>
                         </DialogHeader>
+                        {/* Form inside dialog same as before but cleaner classes */}
                         <div className="grid gap-4 py-4">
                           <div className="grid gap-2">
                             <Label htmlFor="edit-name">Nome</Label>
-                            <Input id="edit-name" value={editingPoint?.name || ''} onChange={(e) => setEditingPoint(prev => prev ? { ...prev, name: e.target.value } : prev)} required />
+                            <Input id="edit-name" value={editingPoint?.name || ''} onChange={(e) => setEditingPoint(prev => prev ? { ...prev, name: e.target.value } : prev)} className="glass-input" />
                           </div>
                           <div className="grid gap-2">
                             <Label htmlFor="edit-description">Descrição</Label>
-                            <Textarea id="edit-description" value={editingPoint?.description || ''} onChange={(e) => setEditingPoint(prev => prev ? { ...prev, description: e.target.value } : prev)} />
+                            <Textarea id="edit-description" value={editingPoint?.description || ''} onChange={(e) => setEditingPoint(prev => prev ? { ...prev, description: e.target.value } : prev)} className="glass-input" />
                           </div>
                           <div className="grid gap-2">
                             <Label htmlFor="edit-address">Endereço</Label>
-                            <Input id="edit-address" value={editingPoint?.address || ''} onChange={(e) => setEditingPoint(prev => prev ? { ...prev, address: e.target.value } : prev)} required />
+                            <Input id="edit-address" value={editingPoint?.address || ''} onChange={(e) => setEditingPoint(prev => prev ? { ...prev, address: e.target.value } : prev)} className="glass-input" />
                           </div>
                           <div className="grid gap-2">
                             <Label htmlFor="edit-types">Tipos aceitos</Label>
-                            <Input id="edit-types" value={editingPoint?.types || ''} onChange={(e) => setEditingPoint(prev => prev ? { ...prev, types: e.target.value } : prev)} />
+                            <Input id="edit-types" value={editingPoint?.types || ''} onChange={(e) => setEditingPoint(prev => prev ? { ...prev, types: e.target.value } : prev)} className="glass-input" />
                           </div>
                           <div className="grid gap-2">
                             <Label htmlFor="edit-hours">Horário</Label>
-                            <Input id="edit-hours" value={editingPoint?.hours || ''} onChange={(e) => setEditingPoint(prev => prev ? { ...prev, hours: e.target.value } : prev)} />
+                            <Input id="edit-hours" value={editingPoint?.hours || ''} onChange={(e) => setEditingPoint(prev => prev ? { ...prev, hours: e.target.value } : prev)} className="glass-input" />
                           </div>
                         </div>
                         <DialogFooter>
-                          <DialogClose asChild>
-                            <Button variant="outline">Cancelar</Button>
-                          </DialogClose>
                           <Button onClick={updatePoint} disabled={loading}>Salvar</Button>
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
 
-                    {/* Botão Pausar e Ativar */}
                     <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => toggleActivePoint(p.id, p.is_active)} //Passa o ID e o status atual.
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => toggleActivePoint(p.id, p.is_active)}
                       disabled={loading}
+                      className={p.is_active ? "text-emerald-500 hover:text-emerald-400" : "text-amber-500 hover:text-amber-400"}
                     >
-                      {p.is_active ? (
-                        <>
-                          <PauseCircle className="h-4 w-4 mr-2" /> Pausar
-                        </>
-                      ) : (
-                        <>
-                          <PlayCircle className="h-4 w-4 mr-2" /> Ativar
-                        </>
-                      )}
+                      {p.is_active ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}
                     </Button>
 
-                    <Button variant="destructive" size="sm" onClick={() => deletePoint(p.id)} disabled={loading}>
-                      <Trash2 className="h-4 w-4 mr-2" /> Excluir
+                    <Button variant="ghost" size="icon" onClick={() => deletePoint(p.id)} disabled={loading} className="text-red-500 hover:text-red-600 hover:bg-red-500/10">
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </>
                 )}
               </div>
             </div>
-          ))}
-        </CardContent>
-        {isCollector && (
-          <CardFooter className="justify-end">
-            <Button asChild>
-              <Link to="/pontos/novo">
-                <PlusCircle className="h-4 w-4 mr-2" /> Cadastrar Novo Ponto
-              </Link>
-            </Button>
-          </CardFooter>
-        )}
-      </Card>
+
+            {/* Background Noise/Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

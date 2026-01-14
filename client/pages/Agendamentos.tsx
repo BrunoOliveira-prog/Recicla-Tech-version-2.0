@@ -143,50 +143,110 @@ export default function Agendamentos() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Agendamentos</CardTitle>
-          <CardDescription>
-            {isRecycler ? 'Gerencie os detalhes dos seus agendamentos.' : 'Gerencie as solicitações de coleta.'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-3">
-          {items.length === 0 && <p className="text-muted-foreground">Nenhum agendamento encontrado.</p>}
-          {items.sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime()).map((b, index) => (
-            <div key={b.id} className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3">
-              <div className="space-y-1 w-full lg:w-1/2">
-                <p className="font-medium">Agendamento #{index + 1} • {new Date(b.scheduled_at).toLocaleString()}</p>
-                <p className="text-sm text-muted-foreground">Status: <span className="font-semibold">{statusMap[b.status] || b.status}</span></p>
-                {b.recycler_address && <p className="text-sm text-muted-foreground">Endereço: {b.recycler_address}</p>}
-                <p className="text-sm text-muted-foreground">Tipo: {b.waste_type}</p>
-                <p className="text-sm text-muted-foreground">Quantidade: {b.quantity}</p>
-                <p className="text-sm text-muted-foreground">Peso Estimado: {b.weight} kg</p>
-                {b.collected_weight && <p className="text-sm font-semibold">Peso Coletado: {b.collected_weight} kg</p>}
-                <p className="text-sm text-muted-foreground">Observações: {b.notes || 'Nenhuma'}</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div className="space-y-1">
+          <h1 className="text-4xl font-black font-heading tracking-tight text-foreground">Agendamentos</h1>
+          <p className="text-muted-foreground font-body text-lg">
+            {isRecycler
+              ? 'Acompanhe o status das suas coletas agendadas.'
+              : 'Gerencie o fluxo de coletas e atualize o status dos pedidos.'}
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {items.length === 0 && (
+          <div className="text-center py-20 opacity-50">
+            <span className="text-6xl mb-4 block">📅</span>
+            <p className="text-xl font-heading text-muted-foreground">Nenhum agendamento encontrado.</p>
+          </div>
+        )}
+
+        {items.sort((a, b) => new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime()).map((b, index) => (
+          <div
+            key={b.id}
+            className="glass-card p-6 rounded-3xl relative overflow-hidden transition-all hover:scale-[1.01] hover:shadow-2xl border-white/10 flex flex-col lg:flex-row gap-6 items-start lg:items-center"
+            style={{ animationDelay: `${index * 50}ms` }}
+          >
+            {/* Decorative Left Border */}
+            <div className={`absolute left-0 top-0 bottom-0 w-2 ${b.status === 'COMPLETED' ? 'bg-emerald-500' :
+                b.status === 'CONFIRMED' ? 'bg-blue-500' :
+                  b.status === 'PENDING' ? 'bg-amber-500' :
+                    b.status === 'CANCELLED' ? 'bg-red-500' : 'bg-gray-500'
+              }`} />
+
+            {/* Date Badge */}
+            <div className="text-center min-w-[100px] p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+              <span className="block text-3xl font-black font-heading text-primary">
+                {new Date(b.scheduled_at).getDate()}
+              </span>
+              <span className="block text-xs uppercase tracking-wider font-bold text-muted-foreground">
+                {new Date(b.scheduled_at).toLocaleString('default', { month: 'short' }).toUpperCase()}
+              </span>
+              <span className="block text-sm font-medium mt-1 text-foreground/80">
+                {new Date(b.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
+
+            {/* Info Content */}
+            <div className="flex-1 space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${b.status === 'COMPLETED' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' :
+                    b.status === 'CONFIRMED' ? 'bg-blue-500/20 text-blue-400 border-blue-500/50' :
+                      b.status === 'PENDING' ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' :
+                        b.status === 'CANCELLED' ? 'bg-red-500/20 text-red-400 border-red-500/50' : 'bg-gray-500/20 text-gray-400 border-gray-500/50'
+                  }`}>
+                  {statusMap[b.status] || b.status}
+                </span>
+                <h3 className="font-heading font-bold text-xl text-foreground">
+                  {b.waste_type} <span className="text-muted-foreground font-body font-normal text-base">({b.quantity} itens)</span>
+                </h3>
               </div>
+
+              <p className="text-muted-foreground font-body flex items-center gap-2">
+                <span className="font-bold text-foreground/60">Peso Est.:</span> {b.weight}kg
+                {b.collected_weight && <span className="ml-2 font-bold text-emerald-500">✅ Coletado: {b.collected_weight}kg</span>}
+              </p>
+
+              {b.recycler_address && (
+                <p className="text-sm text-muted-foreground/80 italic font-body max-w-2xl">
+                  📍 {b.recycler_address}
+                </p>
+              )}
+              {b.notes && (
+                <p className="text-sm text-muted-foreground/60 font-body max-w-2xl border-l-2 border-white/10 pl-2">
+                  "{b.notes}"
+                </p>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-center gap-2 w-full lg:w-auto mt-4 lg:mt-0">
               {isRecycler ? (
-                <div className="flex flex-col sm:flex-row items-center gap-2 w-full lg:w-1/2 justify-end">
-                  <Button variant="outline" size="sm" onClick={() => setEditingBooking(b)} disabled={loading || b.status === 'COMPLETED' || b.status === 'CANCELLED'}>
+                <>
+                  <Button variant="ghost" size="sm" onClick={() => setEditingBooking(b)} disabled={loading || b.status === 'COMPLETED' || b.status === 'CANCELLED'} className="hover:bg-white/10">
                     <Pencil className="h-4 w-4 mr-2" /> Editar
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => togglePauseBooking(b.id, b.status)} disabled={loading || b.status === 'COMPLETED' || b.status === 'CANCELLED'}>
+                  <Button variant="ghost" size="sm" onClick={() => togglePauseBooking(b.id, b.status)} disabled={loading || b.status === 'COMPLETED' || b.status === 'CANCELLED'} className="hover:bg-white/10">
                     {b.status === 'PAUSED' ? <><PlayCircle className="h-4 w-4 mr-2" /> Reativar</> : <><PauseCircle className="h-4 w-4 mr-2" /> Pausar</>}
                   </Button>
-                  <Button variant="destructive" size="sm" onClick={() => deleteBooking(b.id)} disabled={loading || b.status === 'COMPLETED' || b.status === 'CANCELLED'}>
+                  <Button variant="ghost" size="sm" onClick={() => deleteBooking(b.id)} disabled={loading || b.status === 'COMPLETED' || b.status === 'CANCELLED'} className="text-red-500 hover:bg-red-500/10 hover:text-red-600">
                     <Trash2 className="h-4 w-4 mr-2" /> Excluir
                   </Button>
-                </div>
+                </>
               ) : (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-2 min-w-[180px]">
                   {b.status === 'PENDING' && b.collector_id == null && (
-                    <Button size="sm" onClick={() => updateStatus(b.id, 'CONFIRMED')}>Assumir</Button>
+                    <Button size="sm" onClick={() => updateStatus(b.id, 'CONFIRMED')} className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+                      Assumir Coleta
+                    </Button>
                   )}
                   <Select
                     value={b.status}
                     onValueChange={(newStatus) => handleStatusChange(b, newStatus)}
-                    disabled={loading || b.status === 'COMPLETED' || b.status === 'CANCELLED'}
+                    disabled={loading || b.status === 'CANCELLED'}
                   >
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-full bg-white/5 border-white/10 backdrop-blur-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -198,9 +258,9 @@ export default function Agendamentos() {
                 </div>
               )}
             </div>
-          ))}
-        </CardContent>
-      </Card>
+          </div>
+        ))}
+      </div>
 
       {/* Editar agendamento para o usuário Reciclador */}
       <Dialog open={!!editingBooking} onOpenChange={(isOpen) => !isOpen && setEditingBooking(null)}>
@@ -291,7 +351,7 @@ export default function Agendamentos() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       {/* Registrar peso coletado para o usuário Coletor */}
       <Dialog open={!!bookingToComplete} onOpenChange={(isOpen) => !isOpen && setBookingToComplete(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
