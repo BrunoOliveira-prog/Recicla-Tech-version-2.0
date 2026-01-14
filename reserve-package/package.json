@@ -1,0 +1,12 @@
+{
+  "name": "reciclatech-reserve",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Reserva (future use) - npm based package, does not affect main app",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "echo Reserve package build",
+    "test": "echo No tests"
+  },
+  "packageManager": "npm@10.9.0"
+}
