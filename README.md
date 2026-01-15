@@ -9,6 +9,8 @@ Emerald & Teal (Esmeralda e Verde-azulado): Substituímos o verde padrão por to
 Por que? O verde remete à natureza, mas o tom "Teal" traz um toque de tecnologia e inovação, fugindo do clichê de "site de reciclagem antigo".
 Dark Mode & Glassmorphism:
 Por que? O efeito de vidro fosco (backdrop-blur) no header e nos cards cria profundidade e hierarquia sem poluir a tela. É uma tendência forte em interfaces modernas (como iOS e Windows 11).
+
+
 2. Experiência do Usuário (UX)
 O foco foi reduzir a Carga Cognitiva do usuário. Ou seja, fazer com que ele pense menos para realizar uma tarefa.
 
@@ -21,12 +23,12 @@ Problema: Formulários longos são tediosos.
 Solução:
 Agrupamento visual de campos relacionados (Data/Hora, Peso/Quantidade).
 Uso de ícones (lucide-react) para facilitar o reconhecimento visual rápido do que é pedido em cada campo.
+
+
 3. Arquitetura Frontend
 Mantivemos a base (React + Vite), mas refinamos a estrutura de componentes.
-
 Componentização (Shadcn UI)
 Utilizamos componentes da biblioteca Shadcn UI (baseada em Radix UI e Tailwind).
-
 Vantagem: Acessibilidade garantida (navegação por teclado, leitores de tela) e consistência visual automática. Não precisamos "reinventar a roda" para criar um Accordion ou um Modal.
 Tailwind CSS (Utility-First)
 Todo o estilo foi feito com classes utilitárias.
