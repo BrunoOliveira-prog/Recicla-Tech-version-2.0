@@ -12,3 +12,6 @@ O foco foi reduzir o esforço mental do usuário para realizar tarefas (Lei de M
 ### 3. Arquitetura Frontend
 - **Componentização (Shadcn UI):** Adoção de uma biblioteca de componentes baseada em Radix UI para garantir acessibilidade (leitores de tela, navegação por teclado) e consistência.
 - **Utility-First (Tailwind CSS):** Estilização feita diretamente nas classes utilitárias, facilitando a manutenção e garantindo a fidelidade ao Design System sem a necessidade de arquivos CSS gigantescos.
+---
+## 🔗 Links Úteis
+- [Artigo do Projeto (Google Drive)](https://drive.google.com/drive/folders/1f9EoYfYmqkjtvVatajoLr5fkP8DPe6F4?usp=sharing)
